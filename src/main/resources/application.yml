@@ -1,0 +1,17 @@
+hostname: "login-test"
+spring:
+# profiles:
+#   active: "dev"
+  config:
+    import: classpath:credentials.yml
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: "906995767347-fruvk9jt376vlubmihesvkn80s8421po.apps.googleusercontent.com"
+            redirect-uri: "https://${hostname}.ao.incrage.com/login/oauth2/code/{registrationId}"
+            scope:
+              - openid
+              - profile
+              - email
