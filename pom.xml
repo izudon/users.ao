@@ -37,7 +37,25 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-oauth2-client</artifactId>
     </dependency>
-  </dependencies>
+
+    <dependency>
+      <groupId>org.springframework.session</groupId>
+      <artifactId>spring-session-jdbc</artifactId>
+    </dependency>
+ 
+    <!-- Spring Boot Starter JDBC (HikariCPを含む) -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-jdbc</artifactId>
+    </dependency>
+
+    <!-- MariaDBドライバ -->
+    <dependency>
+      <groupId>org.mariadb.jdbc</groupId>
+      <artifactId>mariadb-java-client</artifactId>
+      <!-- <version>3.3.3</version> 最新安定版に合わせてください -->
+    </dependency>
+</dependencies>
   
   <build>
       <plugins>

@@ -10,8 +10,22 @@ spring:
         registration:
           google:
             client-id: "906995767347-fruvk9jt376vlubmihesvkn80s8421po.apps.googleusercontent.com"
+            client-secret:
             redirect-uri: "https://${hostname}.ao.incrage.com/login/oauth2/code/{registrationId}"
             scope:
               - openid
               - profile
               - email
+  datasource:
+    url: jdbc:mariadb://i8:3306/ao_login
+    username: ao_login
+    password:
+    driver-class-name: org.mariadb.jdbc.Driver
+  session:
+    jdbc:
+      data-source-name: session-data-source
+session-data-source:
+  jdbcUrl: jdbc:mariadb://i8:3306/ao_session
+  username: ao_login
+  password:
+  driver-class-name: org.mariadb.jdbc.Driver
