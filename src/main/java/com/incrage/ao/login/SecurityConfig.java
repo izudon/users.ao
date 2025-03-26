@@ -1,4 +1,4 @@
-package com.example.hello.spring;
+package com.incrage.ao.login;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

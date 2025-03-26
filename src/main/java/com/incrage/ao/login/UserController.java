@@ -1,4 +1,4 @@
-package com.example.hello.spring;
+package com.incrage.ao.login;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
