@@ -1,4 +1,4 @@
-package com.incrage.ao.login;
+package com.incrage.ao.users;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;

@@ -1,4 +1,4 @@
-package com.incrage.ao.login;
+package com.incrage.ao.users;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;

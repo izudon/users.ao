@@ -1,4 +1,3 @@
-hostname: "login-test"
 spring:
 # profiles:
 #   active: "dev"
@@ -11,7 +10,6 @@ spring:
           google:
             client-id: "906995767347-fruvk9jt376vlubmihesvkn80s8421po.apps.googleusercontent.com"
             client-secret:
-            redirect-uri: "https://${hostname}.ao.incrage.com/login/oauth2/code/{registrationId}"
             scope:
               - openid
               - profile
@@ -29,3 +27,10 @@ session-data-source:
   username: ao_login
   password:
   driver-class-name: org.mariadb.jdbc.Driver
+jwt:
+  secret-key:
+  expiration-ms: 1500000 # 25 min.
+server:
+  address:
+  port:
+  forward-headers-strategy: framework

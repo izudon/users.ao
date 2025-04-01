@@ -55,7 +55,26 @@
       <artifactId>mariadb-java-client</artifactId>
       <!-- <version>3.3.3</version> 最新安定版に合わせてください -->
     </dependency>
-</dependencies>
+
+    <!-- JJWT Json Web Token (needs version directive)-->
+    <dependency>
+      <groupId>io.jsonwebtoken</groupId>
+      <artifactId>jjwt-api</artifactId>
+      <version>0.11.5</version>
+    </dependency>
+    <dependency>
+      <groupId>io.jsonwebtoken</groupId>
+      <artifactId>jjwt-impl</artifactId>
+      <scope>runtime</scope>
+      <version>0.11.5</version>
+    </dependency>
+    <dependency>
+      <groupId>io.jsonwebtoken</groupId>
+      <artifactId>jjwt-jackson</artifactId> <!-- or jjwt-gson if you prefer -->
+      <scope>runtime</scope>
+      <version>0.11.5</version>
+    </dependency>
+  </dependencies>
   
   <build>
       <plugins>
