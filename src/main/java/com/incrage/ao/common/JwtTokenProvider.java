@@ -1,4 +1,4 @@
-package com.incrage.ao.users;
+package com.incrage.ao.common;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;

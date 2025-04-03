@@ -1,4 +1,4 @@
-package com.incrage.ao.users;
+package com.incrage.ao.common;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -26,14 +26,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         HttpServletResponse response,
         FilterChain filterChain
     ) throws ServletException, IOException {
-
-        String path = request.getRequestURI();
-
-        // /enter/** および /login/** はスキップ（認証処理を通さず次に進む）
-        if (path.startsWith("/enter/") || path.startsWith("/login/")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
 
         String token = jwtTokenProvider.resolveToken(request);
 

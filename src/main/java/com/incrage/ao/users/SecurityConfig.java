@@ -16,19 +16,20 @@ import org.springframework.security
     .config.annotation.web.configurers.HttpBasicConfigurer;
 import org.springframework.security
     .config.annotation.web.configurers.LogoutConfigurer;
-
+import com.incrage.ao.common.JwtAuthenticationEntryPoint;
+    
 @Configuration
 public class SecurityConfig {
 
     private final ClientRegistrationRepository repo;
     private final CustomAuthenticationSuccessHandler handler;
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final UsersJwtAuthenticationFilter jwtAuthenticationFilter;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     public SecurityConfig(
         ClientRegistrationRepository repo,
         CustomAuthenticationSuccessHandler handler,
-        JwtAuthenticationFilter jwtAuthenticationFilter,
+        UsersJwtAuthenticationFilter jwtAuthenticationFilter,
         JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint
     ) {
         this.repo = repo;
