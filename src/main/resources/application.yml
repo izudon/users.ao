@@ -29,6 +29,7 @@ session-data-source:
   driver-class-name: org.mariadb.jdbc.Driver
 jwt:
   secret-key:
+  secret-key-spare:
   expiration-ms: 1500000 # 25 min.
 server:
   address:

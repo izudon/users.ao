@@ -4,9 +4,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security
     .config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security
+    .web.SecurityFilterChain;
 import org.springframework.security
     .oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security
+    .web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security
     .config.annotation.web.configurers.FormLoginConfigurer;
 import org.springframework.security
@@ -19,20 +22,25 @@ public class SecurityConfig {
 
     private final ClientRegistrationRepository repo;
     private final CustomAuthenticationSuccessHandler handler;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     public SecurityConfig(
         ClientRegistrationRepository repo,
-        CustomAuthenticationSuccessHandler handler
+        CustomAuthenticationSuccessHandler handler,
+        JwtAuthenticationFilter jwtAuthenticationFilter,
+        JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint
     ) {
         this.repo = repo;
         this.handler = handler;
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
     }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http)
 	throws Exception {
         http
-
 	    // 不要な認証機能等を disable
 	    .csrf(csrf -> csrf.disable())       // CSRF 無効
 	    .with(new FormLoginConfigurer<HttpSecurity>()
@@ -42,11 +50,15 @@ public class SecurityConfig {
 	    .with(new LogoutConfigurer<HttpSecurity>()
 		  , config -> config.disable()) // ログアウト機能無効
 
-            .authorizeHttpRequests(authz -> authz
-                .anyRequest().permitAll()
+            .exceptionHandling(e -> e
+                .authenticationEntryPoint(jwtAuthenticationEntryPoint)
             )
-	    
-	    // OAuth2 の設定
+
+            .authorizeHttpRequests(authz -> authz
+                .requestMatchers("/enter/**", "/login/**").permitAll()
+                .anyRequest().authenticated()
+            )
+
             .oauth2Login(oauth -> oauth
                 .authorizationEndpoint(endpoint -> endpoint
                     .authorizationRequestResolver(
@@ -54,7 +66,11 @@ public class SecurityConfig {
                     )
                 )
                 .successHandler(handler)
-            );
+            )
+
+            .addFilterBefore(jwtAuthenticationFilter,
+                             UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
 }
