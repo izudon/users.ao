@@ -10,7 +10,7 @@ import javax.sql.DataSource;
 public class DataSourceConfig {
 
     @Bean("sessionDataSource")
-    @ConfigurationProperties(prefix = "session-data-source")
+    @ConfigurationProperties(prefix = "app.session-data-source")
     public DataSource sessionDataSource() {
         return DataSourceBuilder.create().build();
     }

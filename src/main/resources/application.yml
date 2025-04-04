@@ -15,23 +15,23 @@ spring:
               - profile
               - email
   datasource:
-    url: jdbc:mariadb://i8:3306/ao_login
-    username: ao_login
+    url:
+    username:
     password:
-    driver-class-name: org.mariadb.jdbc.Driver
+    driver-class-name:
   session:
     jdbc:
       data-source-name: session-data-source
-session-data-source:
-  jdbcUrl: jdbc:mariadb://i8:3306/ao_session
-  username: ao_login
-  password:
-  driver-class-name: org.mariadb.jdbc.Driver
 server:
   address:
   port:
   forward-headers-strategy: framework
 app:
+  session-data-source:
+    jdbcUrl:
+    username:
+    password:
+    driver-class-name:
   jwt:
     secret-key:
     secret-key-spare:
