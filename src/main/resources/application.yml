@@ -1,6 +1,6 @@
 spring:
-# profiles:
-#   active: "dev"
+  profiles:
+    active: dev
   config:
     import: classpath:credentials.yml
   security:
@@ -21,7 +21,7 @@ spring:
     driver-class-name:
   session:
     jdbc:
-      data-source-name: session-data-source
+      data-source-name: app.session-data-source
 server:
   address:
   port:
