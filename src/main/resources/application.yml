@@ -1,41 +1,15 @@
 spring:
   profiles:
-    active: dev
+    active: test
   config:
     import: classpath:credentials.yml
-  security:
-    oauth2:
-      client:
-        registration:
-          google:
-            client-id: "906995767347-fruvk9jt376vlubmihesvkn80s8421po.apps.googleusercontent.com"
-            client-secret:
-            scope:
-              - openid
-              - profile
-              - email
-  datasource:
-    url:
-    username:
-    password:
-    driver-class-name:
-  session:
-    jdbc:
-      data-source-name: app.session-data-source
 server:
   address:
   port:
   forward-headers-strategy: framework
 app:
-  session-data-source:
-    jdbcUrl:
-    username:
-    password:
-    driver-class-name:
   jwt:
     secret-key:
     secret-key-spare:
     secret-key-version:
     expiration-ms: 1500000 # 25 min.
-  oauth2:
-    redirect-uri-base:
