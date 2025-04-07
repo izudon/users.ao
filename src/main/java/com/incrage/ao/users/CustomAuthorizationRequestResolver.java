@@ -30,34 +30,75 @@ public class CustomAuthorizationRequestResolver
     @Override
     public OAuth2AuthorizationRequest resolve(HttpServletRequest request,
 					      String uri) {
-        String[] parts = uri.split("/",5);
-        if (parts.length == 5){
-	    if(Set.of("enter", "plus").contains(parts[1])){
-		String registrationId = parts[2];
-		String app            = parts[3];
-		String rest           = parts[4];
-		String query          = request.getQueryString();
-		String targetRedirect
-		    = "https://" + app + ".ao.incrage.com/" + rest
-		    + (query != null ? "?" + query : "");
+        String[] parts = uri.split("/");
+	String action         = null ;
+	String registrationId = null ;
+	String ticketCode     = null ;
+	boolean doRequest     = false; // OAuth2 やるというフラグ
 
-		request.getSession()
-		    .setAttribute("target_url", targetRedirect);
+        if (parts.length > 1) action         = parts[1];
+        if (parts.length > 2) registrationId = parts[2];
+        if (parts.length > 3) ticketCode     = parts[3];
 
-
-		OAuth2AuthorizationRequest req
-		    = defaultResolver.resolve(request, registrationId);
-		if (req == null) return null;
-
-		String redirectUri = "https://api-test.ao.incrage.com"
-		    + "/users/login/oauth2/code/" + registrationId;
-
-		return OAuth2AuthorizationRequest.from(req)
-		    .redirectUri(redirectUri)
-		    .build();
-	    }
-        }
-
+	if( "signup".equals(action)
+	    && ticketCode != null ){
+	    saveAction(request, action);
+	    saveTicketCode(request, ticketCode);
+	    saveRedirect(request);
+	    doRequest         = true; // フラグ ON
+	}
+	if ( Set.of("enter", "plus").contains(action)
+	     && registrationId != null ){
+	    saveAction(request, action);
+	    saveRedirect(request);
+	    doRequest         = true; // フラグ ON
+	}
+	if ( doRequest ){
+	    return buildOAuth2Request(request, registrationId); // OAuth2 やる
+	}
+	
         return null;
+    }
+
+    private void saveAction
+	(HttpServletRequest request, String action) {
+	request.getSession()
+	    .setAttribute("action", action );
+    }
+    private void saveTicketCode
+	(HttpServletRequest request, String ticketCode) {
+	request.getSession()
+	    .setAttribute("redirect", ticketCode );
+    }
+    private void saveRedirect
+	(HttpServletRequest request) {
+	request.getSession()
+	    .setAttribute("redirect", request.getParameter("redirect"));
+    }
+    private OAuth2AuthorizationRequest buildOAuth2Request
+	(HttpServletRequest request, String registrationId) {
+
+	// OAuth2 リクエストオブジェクト
+	OAuth2AuthorizationRequest req
+	    = defaultResolver.resolve(request, registrationId);
+	if (req == null) return null;
+	    
+	// カスタマイズのリダイレクトバックポイント
+	String redirectUri
+	    = oauth2RedirectUri(request, registrationId);
+	
+	// 再ビルドして返す（セッションにも保存）
+	return OAuth2AuthorizationRequest.from(req)
+	    .redirectUri(redirectUri)
+	    .build();
+    }
+    private String oauth2RedirectUri(HttpServletRequest request,
+				    String registrationId) {
+	String host = request.getHeader("X-Forwarded-Host");
+	if (host == null || host.isEmpty()) {
+	    host = request.getHeader("Host");
+	}
+	return "https://" + host + "/users/login/oauth2/code/"
+	    + registrationId;
     }
 }

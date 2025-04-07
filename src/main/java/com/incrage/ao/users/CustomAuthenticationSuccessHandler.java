@@ -12,11 +12,13 @@ import com.incrage.ao.common.JwtTokenProvider;
 import java.io.IOException;
 
 @Component
-public class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
+public class CustomAuthenticationSuccessHandler
+    implements AuthenticationSuccessHandler {
 
     private final JwtTokenProvider jwtTokenProvider;
 
-    public CustomAuthenticationSuccessHandler(JwtTokenProvider jwtTokenProvider) {
+    public CustomAuthenticationSuccessHandler
+	(JwtTokenProvider jwtTokenProvider) {
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
@@ -39,7 +41,8 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
 
         response.addHeader("Set-Cookie", jwtCookie.toString());
 
-        String targetUrl = (String) request.getSession().getAttribute("target_url");
+        String targetUrl
+	    = (String) request.getSession().getAttribute("redirect");
         response.sendRedirect(targetUrl != null ? targetUrl : "/");
     }
 }
