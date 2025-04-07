@@ -35,6 +35,7 @@ app:
   jwt:
     secret-key:
     secret-key-spare:
+    secret-key-version:
     expiration-ms: 1500000 # 25 min.
   oauth2:
     redirect-uri-base:
