@@ -8,3 +8,5 @@ dec:
 	-in src/main/resources/credentials.tgz.enc | \
 	tar xvfz -
 	ls -l src/main/resources/
+random:
+	@head -c 36 /dev/random | base64 | tr '+/' '-_' | tr -d '='

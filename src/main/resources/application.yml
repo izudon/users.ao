@@ -3,6 +3,17 @@ spring:
     active: test
   config:
     import: classpath:credentials.yml
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 906995767347-fruvk9jt376vlubmihesvkn80s8421po.apps.googleusercontent.com
+            client-secret: 
+            scope:
+              - openid
+              - profile
+              - email
 server:
   address:
   port:
