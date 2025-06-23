@@ -11,11 +11,14 @@ import org.springframework.security
 import org.springframework.security
     .web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security
+    .config.http.SessionCreationPolicy;
+import org.springframework.security
     .config.annotation.web.configurers.FormLoginConfigurer;
 import org.springframework.security
     .config.annotation.web.configurers.HttpBasicConfigurer;
 import org.springframework.security
     .config.annotation.web.configurers.LogoutConfigurer;
+import org.springframework.core.annotation.Order;
 import com.incrage.ao.common.JwtAuthenticationEntryPoint;
     
 @Configuration
@@ -39,27 +42,15 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http)
+    @Order(1)
+    public SecurityFilterChain oauth2FilterChain(HttpSecurity http)
 	throws Exception {
+	http = myBasicHttpSecurity(http);
         http
-	    // 不要な認証機能等を disable
-	    .csrf(csrf -> csrf.disable())       // CSRF 無効
-	    .with(new FormLoginConfigurer<HttpSecurity>()
-		  , config -> config.disable()) // フォームログイン無効
-	    .with(new HttpBasicConfigurer<HttpSecurity>()
-		  , config -> config.disable()) // Basic認証無効
-	    .with(new LogoutConfigurer<HttpSecurity>()
-		  , config -> config.disable()) // ログアウト機能無効
-
-            .exceptionHandling(e -> e
-                .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+            .securityMatcher("/enter/**", "/login/**")
+            .authorizeHttpRequests(auth -> auth
+                .anyRequest().permitAll()
             )
-
-            .authorizeHttpRequests(authz -> authz
-                .requestMatchers("/enter/**", "/login/**").permitAll()
-                .anyRequest().authenticated()
-            )
-
             .oauth2Login(oauth -> oauth
                 .authorizationEndpoint(endpoint -> endpoint
                     .authorizationRequestResolver(
@@ -67,11 +58,42 @@ public class SecurityConfig {
                     )
                 )
                 .successHandler(handler)
-            )
+		//.failureHandler(handler) // TODO
+	    );
+	
+        return http.build();
+    }
 
+    @Bean
+    @Order(2)
+    public SecurityFilterChain apiFilterChain(HttpSecurity http)
+	throws Exception {
+	http = myBasicHttpSecurity(http);
+        http
+	    .sessionManagement(session -> session
+		.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authorizeHttpRequests(auth -> auth
+                .anyRequest().authenticated())
             .addFilterBefore(jwtAuthenticationFilter,
-                             UsernamePasswordAuthenticationFilter.class);
+	        UsernamePasswordAuthenticationFilter.class)
+            .exceptionHandling(e -> e
+                .authenticationEntryPoint(jwtAuthenticationEntryPoint));
 
         return http.build();
+    }
+
+    //----------
+    
+    private HttpSecurity myBasicHttpSecurity(HttpSecurity http)
+	throws Exception {
+	return http
+            .cors(cors -> cors.disable()) // CORS 無効
+            .csrf(csrf -> csrf.disable()) // CSRF 無効
+            .with(new LogoutConfigurer<HttpSecurity>(), 
+                  config -> config.disable()) // ログアウト無効
+            // リクエストキャッシュ機能 無効
+            .requestCache(requestCache -> requestCache.disable())
+            // サーブレットAPI連携（isUserInRole() 等） 無効
+            .servletApi(servletApi -> servletApi.disable());
     }
 }
