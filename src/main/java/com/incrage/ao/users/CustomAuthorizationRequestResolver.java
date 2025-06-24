@@ -1,16 +1,29 @@
 package com.incrage.ao.users;
 
 import java.util.Set;
+import java.net.URI;
+import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.security.oauth2.client
-    .registration.ClientRegistrationRepository;
-import org.springframework.security.oauth2.client
-    .web.DefaultOAuth2AuthorizationRequestResolver;
-import org.springframework.security.oauth2.client
-    .web.OAuth2AuthorizationRequestResolver;
-import org.springframework.security.oauth2.core
-    .endpoint.OAuth2AuthorizationRequest;
+import org.springframework.security
+    .authentication.AbstractAuthenticationToken;
+import org.springframework.security
+    .oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security
+    .oauth2.client.web.DefaultOAuth2AuthorizationRequestResolver;
+import org.springframework.security
+    .oauth2.client.web.OAuth2AuthorizationRequestResolver;
+import org.springframework.security
+    .oauth2.core.endpoint.OAuth2AuthorizationRequest;
 
+/**
+ * ベースとなるクラス DefaultOAuth2AuthorizationRequestResolver の
+ * 動きが基本的に怪しいので：
+ * - getRedirectUri() で
+ *   /login/oauth2/... が返るはずが
+ *   /authorization/oauth2/... が返っているよう。
+ * - 明示的に registrationId を指定して作成した時にしかこれを参照できないよう。
+ * 不可解な点が多いと思いますがご了承ください。
+ */
 public class CustomAuthorizationRequestResolver
     implements OAuth2AuthorizationRequestResolver {
 
@@ -22,83 +35,49 @@ public class CustomAuthorizationRequestResolver
 	    = new DefaultOAuth2AuthorizationRequestResolver(repo, "/dummy");
     }
 
-    @Override
-    public OAuth2AuthorizationRequest resolve(HttpServletRequest request) {
-        return this.resolve(request, request.getRequestURI());
-    }
-
-    @Override
-    public OAuth2AuthorizationRequest resolve(HttpServletRequest request,
-					      String uri) {
-        String[] parts = uri.split("/");
-	String action         = null ;
-	String registrationId = null ;
-	String ticketCode     = null ;
-	boolean doRequest     = false; // OAuth2 やるというフラグ
-
-        if (parts.length > 1) action         = parts[1];
-        if (parts.length > 2) registrationId = parts[2];
-        if (parts.length > 3) ticketCode     = parts[3];
-
-	if( "signup".equals(action)
-	    && ticketCode != null ){
-	    saveAction(request, action);
-	    saveTicketCode(request, ticketCode);
-	    saveRedirect(request);
-	    doRequest         = true; // フラグ ON
-	}
-	if ( Set.of("enter", "plus").contains(action)
-	     && registrationId != null ){
-	    saveAction(request, action);
-	    saveRedirect(request);
-	    doRequest         = true; // フラグ ON
-	}
-	if ( doRequest ){
-	    return buildOAuth2Request(request, registrationId); // OAuth2 やる
-	}
-	
-        return null;
-    }
-
-    private void saveAction
-	(HttpServletRequest request, String action) {
-	request.getSession()
-	    .setAttribute("action", action );
-    }
-    private void saveTicketCode
-	(HttpServletRequest request, String ticketCode) {
-	request.getSession()
-	    .setAttribute("redirect", ticketCode );
-    }
-    private void saveRedirect
-	(HttpServletRequest request) {
-	request.getSession()
-	    .setAttribute("redirect", request.getParameter("redirect"));
-    }
-    private OAuth2AuthorizationRequest buildOAuth2Request
+    @Override // ２引数版 -> １引数版 呼ぶだけ
+    public OAuth2AuthorizationRequest resolve
 	(HttpServletRequest request, String registrationId) {
+        return resolve(request);
+    }
 
-	// OAuth2 リクエストオブジェクト
-	OAuth2AuthorizationRequest req
-	    = defaultResolver.resolve(request, registrationId);
-	if (req == null) return null;
-	    
-	// カスタマイズのリダイレクトバックポイント
-	String redirectUri
-	    = oauth2RedirectUri(request, registrationId);
+    @Override // １引数版
+    public OAuth2AuthorizationRequest resolve
+	(HttpServletRequest request) {
+
+	// 1. 非該当は非処理
+	String path = URI.create(request.getRequestURI()).getPath();
+	if (!path.startsWith("/enter/")) return null;
+
+	// 2. registrationId の取得
+	String registrationId = path.substring(path.lastIndexOf("/") + 1);
 	
-	// 再ビルドして返す（セッションにも保存）
-	return OAuth2AuthorizationRequest.from(req)
+	// 3. 認証成功後の戻り先をセッションに記憶
+        String returnTo = request.getParameter("return_to");
+        if (returnTo != null && !returnTo.isBlank()) {
+            HttpSession session = request.getSession(true); // なければ作成
+            session.setAttribute("return_to", returnTo);
+        }
+
+	// 4. リダイレクトバックポイントのURLを差し替え
+
+	// オリジナルの取得
+	OAuth2AuthorizationRequest original
+	    = defaultResolver.resolve(request, registrationId);
+
+	// ホスト名
+	String host = request.getHeader("X-Forwarded-Host");
+	if (host == null || host.isBlank())
+	    host = request.getHeader("Host");
+
+	// ホスト名の変更とパス先頭への /users 挿入 および https:// 化
+	String redirectUri
+	    = "https://" + host
+	    + "/users/login/oauth2/code/" + registrationId;
+
+	// ビルドして返す
+	return OAuth2AuthorizationRequest.from(original)
 	    .redirectUri(redirectUri)
 	    .build();
-    }
-    private String oauth2RedirectUri(HttpServletRequest request,
-				    String registrationId) {
-	String host = request.getHeader("X-Forwarded-Host");
-	if (host == null || host.isEmpty()) {
-	    host = request.getHeader("Host");
-	}
-	return "https://" + host + "/users/login/oauth2/code/"
-	    + registrationId;
     }
 }

@@ -27,3 +27,4 @@ app:
     secret-key-spare:
     secret-key-version:
     expiration-ms: 1500000 # 25 min.
+    cookie-max-age-day: 45 # 45 days.

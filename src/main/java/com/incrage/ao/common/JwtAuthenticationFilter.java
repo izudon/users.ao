@@ -56,11 +56,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	    if (subject == null)
 		throw new RuntimeException("sub is not set in JWT");
 	    
-	    // 4. DBと引き当て・相互作用（なければ作る）
+	    // 4. DBと引き当て（find）
 	    // ToDo
 	    
-            // 5. SecurityContext に設定
-            Authentication authentication
+            // 5. SecurityContext に設定  // ToDo 本来はDBからの情報をセット。
+            Authentication authentication // 今は JWT の sub をそのまま。
 		= new UsernamePasswordAuthenticationToken(
                 subject, null, Collections.emptyList()
             );
@@ -68,8 +68,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		.setAuthentication(authentication);
 
         } catch (Exception e) {
-            // 401 を返してしまう。
-            SecurityContextHolder.clearContext();
+	    // 1. 認証エラーだったのでコンテキストを削除。
+	    SecurityContextHolder.clearContext();
+		
+            // 2. 401 をここでもう返してしまう。
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
 		"Unauthorized: " + e.getMessage());
             return;
