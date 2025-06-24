@@ -19,26 +19,23 @@ import org.springframework.security
 import org.springframework.security
     .config.annotation.web.configurers.LogoutConfigurer;
 import org.springframework.core.annotation.Order;
-import com.incrage.ao.common.JwtAuthenticationEntryPoint;
-    
+import com.incrage.ao.common.JwtAuthenticationFilter;
+
 @Configuration
 public class SecurityConfig {
 
     private final ClientRegistrationRepository repo;
     private final CustomAuthenticationSuccessHandler handler;
-    private final UsersJwtAuthenticationFilter jwtAuthenticationFilter;
-    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     public SecurityConfig(
         ClientRegistrationRepository repo,
         CustomAuthenticationSuccessHandler handler,
-        UsersJwtAuthenticationFilter jwtAuthenticationFilter,
-        JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint
+        JwtAuthenticationFilter jwtAuthenticationFilter
     ) {
         this.repo = repo;
         this.handler = handler;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
-        this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
     }
 
     @Bean
@@ -75,9 +72,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .anyRequest().authenticated())
             .addFilterBefore(jwtAuthenticationFilter,
-	        UsernamePasswordAuthenticationFilter.class)
-            .exceptionHandling(e -> e
-                .authenticationEntryPoint(jwtAuthenticationEntryPoint));
+	        UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -89,6 +84,7 @@ public class SecurityConfig {
 	return http
             .cors(cors -> cors.disable()) // CORS 無効
             .csrf(csrf -> csrf.disable()) // CSRF 無効
+	    .anonymous().disable()        // 未認証を匿名ユーザでラップしない
             .with(new LogoutConfigurer<HttpSecurity>(), 
                   config -> config.disable()) // ログアウト無効
             // リクエストキャッシュ機能 無効

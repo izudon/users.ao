@@ -10,7 +10,8 @@ import org.springframework.security
 import org.springframework.security.core.Authentication;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.incrage.ao.common.JwtTokenProvider;
+import com.incrage.ao.common.JwtCookie;
+import com.incrage.ao.common.JwtProvider;
 
 import jakarta.servlet.http.Cookie;
 
@@ -27,16 +28,16 @@ public class JwtAuthIntegrationTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private JwtTokenProvider jwtTokenProvider;
+    private JwtProvider jwtProvider;
 
     @Test // 正常
     void access_withValidJwt_returns200() throws Exception {
         Authentication auth
 	    = new UsernamePasswordAuthenticationToken("testuser", null);
-        String token = jwtTokenProvider.createToken(auth);
+        String token = jwtProvider.setClaims(auth.getName());
 
         mockMvc.perform(get("/api/hello")
-                .cookie(new Cookie("JWT_TOKEN", token)))
+                .cookie(new Cookie(JwtCookie.COOKIE_NAME, token)))
                 .andExpect(status().isOk());
     }
 
@@ -49,7 +50,7 @@ public class JwtAuthIntegrationTest {
     @Test // 異常：JWT が不正
     void access_withInvalidJwt_returns401() throws Exception {
         mockMvc.perform(get("/api/hello")
-                .cookie(new Cookie("JWT_TOKEN", "invalid-token")))
+                .cookie(new Cookie(JwtCookie.COOKIE_NAME, "invalid-token")))
                 .andExpect(status().isUnauthorized());
     }
 }

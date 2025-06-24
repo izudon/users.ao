@@ -7,7 +7,8 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
-import com.incrage.ao.common.JwtTokenProvider;
+import com.incrage.ao.common.JwtCookie;
+import com.incrage.ao.common.JwtProvider;
 
 import java.io.IOException;
 
@@ -15,11 +16,15 @@ import java.io.IOException;
 public class CustomAuthenticationSuccessHandler
     implements AuthenticationSuccessHandler {
 
-    private final JwtTokenProvider jwtTokenProvider;
+    private final JwtCookie jwtCookie;
+    private final JwtProvider jwtProvider;
 
-    public CustomAuthenticationSuccessHandler
-	(JwtTokenProvider jwtTokenProvider) {
-        this.jwtTokenProvider = jwtTokenProvider;
+    public CustomAuthenticationSuccessHandler(
+	JwtCookie jwtCookie,
+	JwtProvider jwtProvider
+    ) {
+        this.jwtCookie = jwtCookie;
+        this.jwtProvider = jwtProvider;
     }
 
     @Override
@@ -29,18 +34,13 @@ public class CustomAuthenticationSuccessHandler
             Authentication authentication
     ) throws IOException, ServletException {
 
-        String jwt = jwtTokenProvider.createToken(authentication);
+	// 1. JWT の作成
+        String token = jwtProvider.setClaims(authentication.getName());
 
-        ResponseCookie jwtCookie = ResponseCookie.from("JWT_TOKEN", jwt)
-                .httpOnly(true)
-                .secure(true)
-                .path("/")
-                .maxAge(7 * 24 * 60 * 60)
-                .sameSite("None")
-                .build();
+	// 2. JWT -> Cookie
+	jwtCookie.setToken(token, response);
 
-        response.addHeader("Set-Cookie", jwtCookie.toString());
-
+	// 3. リダイレクトをレスポンス
         String targetUrl
 	    = (String) request.getSession().getAttribute("redirect");
         response.sendRedirect(targetUrl != null ? targetUrl : "/");
