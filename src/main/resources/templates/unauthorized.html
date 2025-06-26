@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>401 Unauthorized</title>
+</head>
+<body>
+    <h1>認証できませんでした</h1>
+    <p>外部での認証処理がうまくいかずログインができませんでした。</p>
+    <a th:href="${return_to}" th:if="${return_to != null}">元のページに戻る</a>
+</body>
+</html>

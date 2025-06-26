@@ -25,16 +25,19 @@ import com.incrage.ao.common.JwtAuthenticationFilter;
 public class SecurityConfig {
 
     private final ClientRegistrationRepository repo;
-    private final CustomAuthenticationSuccessHandler handler;
+    private final CustomAuthenticationSuccessHandler onSuccess;
+    private final CustomAuthenticationFailureHandler onFailure;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     public SecurityConfig(
         ClientRegistrationRepository repo,
-        CustomAuthenticationSuccessHandler handler,
+        CustomAuthenticationSuccessHandler onSuccess,
+        CustomAuthenticationFailureHandler onFailure,
         JwtAuthenticationFilter jwtAuthenticationFilter
     ) {
         this.repo = repo;
-        this.handler = handler;
+        this.onSuccess = onSuccess;
+        this.onFailure = onFailure;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
@@ -54,8 +57,8 @@ public class SecurityConfig {
                         new CustomAuthorizationRequestResolver(repo)
                     )
                 )
-                .successHandler(handler)
-		//.failureHandler(handler) // TODO
+                .successHandler(onSuccess)
+		.failureHandler(onFailure)
 	    );
 	
         return http.build();
@@ -84,9 +87,10 @@ public class SecurityConfig {
 	return http
             .cors(cors -> cors.disable()) // CORS 無効
             .csrf(csrf -> csrf.disable()) // CSRF 無効
-	    .anonymous().disable()        // 未認証を匿名ユーザでラップしない
             .with(new LogoutConfigurer<HttpSecurity>(), 
                   config -> config.disable()) // ログアウト無効
+	    // 未認証を匿名ユーザでラップしない
+	    .anonymous((anonymous) -> anonymous.disable())
             // リクエストキャッシュ機能 無効
             .requestCache(requestCache -> requestCache.disable())
             // サーブレットAPI連携（isUserInRole() 等） 無効
