@@ -10,3 +10,9 @@ dec:
 	ls -l src/main/resources/
 random:
 	@head -c 36 /dev/random | base64 | tr '+/' '-_' | tr -d '='
+dblogin-test:
+	./util/dblogin.sh test
+dblogin-dev:
+	./util/dblogin.sh dev
+dblogin-prod:
+	./util/dblogin.sh prod
