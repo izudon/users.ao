@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -19,6 +21,7 @@ public class Authentication {
 
     @Id
     @Column(name = "id", columnDefinition = "BINARY(16)", nullable = false)
+    @JdbcTypeCode(SqlTypes.BINARY)
     private UUID id;
 
     @Column(name = "registration_id", length = 8, nullable = false)

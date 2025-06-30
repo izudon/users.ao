@@ -14,6 +14,7 @@ import org.springframework.security
 import org.springframework.stereotype.Component;
 import com.incrage.ao.common.JwtCookie;
 import com.incrage.ao.common.JwtProvider;
+import com.incrage.ao.users.service.AuthenticationService;
 
 import java.io.IOException;
 
@@ -24,13 +25,16 @@ public class CustomAuthenticationSuccessHandler
     private final String RETURN_TO = "https://www.incrage.com/";
     private final JwtCookie jwtCookie;
     private final JwtProvider jwtProvider;
+    private final AuthenticationService authService;
 
     public CustomAuthenticationSuccessHandler(
 	JwtCookie jwtCookie,
-	JwtProvider jwtProvider
+	JwtProvider jwtProvider,
+	AuthenticationService authService
     ) {
         this.jwtCookie = jwtCookie;
         this.jwtProvider = jwtProvider;
+        this.authService = authService;
     }
 
     @Override
@@ -45,13 +49,15 @@ public class CustomAuthenticationSuccessHandler
 	String registrationId;
 	if (authentication instanceof OAuth2AuthenticationToken oauthToken)
 	    registrationId = oauthToken.getAuthorizedClientRegistrationId();
+	else
+	    throw new IllegalStateException();
 
-	// 2. DBと引き当て（findOrSave） // ToDo
-	String jwtSubject = authentication.getName();
-	// ToDo 本来はaccounts テーブルのキー ^^^
+	// 2. DBと引き当て
+	com.incrage.ao.users.entity.Authentication dbauth
+	    = authService.findOrSave(registrationId, subject);
 	
 	// 3. JWT の作成 -> Cookie にセット
-        String token = jwtProvider.setClaims(jwtSubject);
+        String token = jwtProvider.setClaims(dbauth.getId().toString());
 	jwtCookie.setToken(token, response);
 
 	// 4. 遷移先の復元・セッションの削除

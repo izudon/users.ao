@@ -52,4 +52,11 @@ public class AuthenticationService {
         throw new IllegalStateException(
 	    "Failed to save Authentication after retries");
     }
+
+    public Authentication findOrSave(String registrationId, String subject) {
+	Authentication auth = new Authentication();
+	auth.setRegistrationId(registrationId);
+	auth.setSubject(subject);
+	return findOrSave(auth);
+    }
 }
