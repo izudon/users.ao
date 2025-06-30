@@ -1,4 +1,4 @@
-package com.incrage.ao.users;
+package com.incrage.ao.users.config;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

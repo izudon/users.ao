@@ -1,4 +1,4 @@
-package com.incrage.ao.users;
+package com.incrage.ao.users.config.flow;
 
 import java.net.URLEncoder;
 import jakarta.servlet.ServletException;

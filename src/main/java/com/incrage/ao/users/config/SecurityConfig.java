@@ -1,4 +1,4 @@
-package com.incrage.ao.users;
+package com.incrage.ao.users.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,6 +20,9 @@ import org.springframework.security
     .config.annotation.web.configurers.LogoutConfigurer;
 import org.springframework.core.annotation.Order;
 import com.incrage.ao.common.JwtAuthenticationFilter;
+import com.incrage.ao.users.config.flow.CustomAuthenticationSuccessHandler;
+import com.incrage.ao.users.config.flow.CustomAuthenticationFailureHandler;
+import com.incrage.ao.users.config.flow.CustomAuthorizationRequestResolver;
 
 @Configuration
 public class SecurityConfig {

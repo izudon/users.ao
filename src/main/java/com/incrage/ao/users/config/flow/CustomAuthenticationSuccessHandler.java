@@ -1,4 +1,4 @@
-package com.incrage.ao.users;
+package com.incrage.ao.users.config.flow;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpSession;
