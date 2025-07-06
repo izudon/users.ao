@@ -25,7 +25,7 @@ public class JwtCookie {
     }
 
     // JWT を Cookie から取り出す
-    public String getToken(HttpServletRequest request) {
+    public String get(HttpServletRequest request) {
         if (request.getCookies() == null) {
             return null;
         }
@@ -38,7 +38,7 @@ public class JwtCookie {
     }
 
     // JWT を Cookie に追加（レスポンスにセット）
-    public void setToken(String jwt, HttpServletResponse response) {
+    public void set(String jwt, HttpServletResponse response) {
 	String cookie = baseCookie(jwt)
 	    .maxAge(Duration.ofDays(cookieMaxAgeDay))
 	    .build()
@@ -47,7 +47,7 @@ public class JwtCookie {
     }
 
     // JWT を Cookie から削除（期限が今の Cookie をレスポンスにセット）
-    public void deleteToken(HttpServletResponse response) {
+    public void delete(HttpServletResponse response) {
 	String cookie = baseCookie("")
 	    .maxAge(Duration.ZERO)
 	    .build()

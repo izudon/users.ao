@@ -27,7 +27,7 @@ public class LogoutController {
             Model model ) {
 
 	// 1. JWT Cookie を削除。
-        jwtCookie.deleteToken(response);        
+        jwtCookie.delete(response);        
 
 	// 2. return_to があれば設定。
 	if (returnTo != null && !returnTo.isBlank())

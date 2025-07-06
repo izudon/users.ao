@@ -44,7 +44,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
         try {
 	    // 1. Cookie から JWT を取得
-	    String token = jwtCookie.getToken(request);
+	    String token = jwtCookie.get(request);
 	    if (token == null)
 		throw new RuntimeException("JWT Cookie is not set");
 

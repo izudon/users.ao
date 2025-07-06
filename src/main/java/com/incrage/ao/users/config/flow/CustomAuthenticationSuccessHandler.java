@@ -58,7 +58,7 @@ public class CustomAuthenticationSuccessHandler
 	
 	// 3. JWT の作成 -> Cookie にセット
         String token = jwtProvider.setClaims(dbauth.getId().toString());
-	jwtCookie.setToken(token, response);
+	jwtCookie.set(token, response);
 
 	// 4. 遷移先の復元・セッションの削除
 	HttpSession session = request.getSession();
