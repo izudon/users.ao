@@ -14,6 +14,8 @@ public class JwtCookie {
 
     public static final String COOKIE_NAME = "JWT_TOKEN";
 
+    public static final String COOKIE_DOMAIN = "incrage.com";
+
     private final int cookieMaxAgeDay;
 
     public JwtCookie(
@@ -35,17 +37,31 @@ public class JwtCookie {
         return null;
     }
 
-    // JWT を Cookie にセットしてレスポンスに追加
+    // JWT を Cookie に追加（レスポンスにセット）
     public void setToken(String jwt, HttpServletResponse response) {
-	String cookie = ResponseCookie.from(COOKIE_NAME, jwt)
-	    .path("/")
-	    .httpOnly(true)
-	    .secure(true)
-	    .sameSite("None")
+	String cookie = baseCookie(jwt)
 	    .maxAge(Duration.ofDays(cookieMaxAgeDay))
 	    .build()
 	    .toString();
-
 	response.addHeader("Set-Cookie", cookie);
+    }
+
+    // JWT を Cookie から削除（期限が今の Cookie をレスポンスにセット）
+    public void deleteToken(HttpServletResponse response) {
+	String cookie = baseCookie("")
+	    .maxAge(Duration.ZERO)
+	    .build()
+	    .toString();
+	response.addHeader("Set-Cookie", cookie);
+    }
+
+    // 期限以外の部分を共通にビルドする private 関数
+    private ResponseCookie.ResponseCookieBuilder baseCookie(String baseStr) {
+	return ResponseCookie.from(COOKIE_NAME, baseStr)
+	    .domain(COOKIE_DOMAIN)
+	    .path("/")
+	    .httpOnly(true)
+	    .secure(true)
+	    .sameSite("None");
     }
 }

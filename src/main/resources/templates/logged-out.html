@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>200 logged-out</title>
+</head>
+<body>
+    <h1>ログアウトしました</h1>
+    <ul>
+      <li>認証情報（誰であるかの情報）をブラウザから削除しました。</li>
+      <li>再度ログインされるまでこの情報は当社には送られません。</li>
+    </p>
+    <a th:href="${return_to}" th:if="${return_to != null}">元のページに戻る</a>
+</body>
+</html>
