@@ -47,7 +47,7 @@ public class CustomAuthorizationRequestResolver
 
 	// 1. 非該当は非処理
 	String path = URI.create(request.getRequestURI()).getPath();
-	if (!path.startsWith("/enter/")) return null;
+	if (!path.startsWith("/login/oauth2/register/")) return null;
 
 	// 2. registrationId の取得
 	String registrationId = path.substring(path.lastIndexOf("/") + 1);

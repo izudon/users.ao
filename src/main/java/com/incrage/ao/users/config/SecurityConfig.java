@@ -50,7 +50,7 @@ public class SecurityConfig {
 	throws Exception {
 	http = myBasicHttpSecurity(http);
         http
-            .securityMatcher("/enter/**", "/login/**")
+            .securityMatcher("/login/**")
             .authorizeHttpRequests(auth -> auth
                 .anyRequest().permitAll()
             )
