@@ -61,19 +61,25 @@ public class CustomAuthorizationRequestResolver
 
 	// 4. リダイレクトバックポイントのURLを差し替え
 
-	// オリジナルの取得
-	OAuth2AuthorizationRequest original
-	    = defaultResolver.resolve(request, registrationId);
-
 	// ホスト名
 	String host = request.getHeader("X-Forwarded-Host");
 	if (host == null || host.isBlank())
 	    host = request.getHeader("Host");
 
-	// ホスト名の変更とパス先頭への /users 挿入 および https:// 化
-	String redirectUri
-	    = "https://" + host
-	    + "/users/login/oauth2/code/" + registrationId;
+	// パス
+	String originalUri = request.getHeader("X-Original-URI");
+	String modifiedPath = "/api/login/oauth2/code/" + registrationId;
+	if (originalUri != null && !originalUri.isBlank()) {
+	    String originalPath = URI.create(originalUri).getPath();
+	    modifiedPath = originalPath.replace("/register/", "/code/");
+	}
+
+	// リダイレクトバックポイント
+	String redirectUri = "https://" + host + modifiedPath;
+
+	// オリジナルの取得
+	OAuth2AuthorizationRequest original
+	    = defaultResolver.resolve(request, registrationId);
 
 	// ビルドして返す
 	return OAuth2AuthorizationRequest.from(original)

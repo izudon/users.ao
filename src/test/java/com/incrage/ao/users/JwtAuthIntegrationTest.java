@@ -36,20 +36,20 @@ public class JwtAuthIntegrationTest {
 	    = new UsernamePasswordAuthenticationToken("testuser", null);
         String token = jwtProvider.setClaims(auth.getName());
 
-        mockMvc.perform(get("/api/hello")
+        mockMvc.perform(get("/hello")
                 .cookie(new Cookie(JwtCookie.COOKIE_NAME, token)))
                 .andExpect(status().isOk());
     }
 
     @Test // 異常：JWT の設定なし
     void access_withNoJwt_returns401() throws Exception {
-        mockMvc.perform(get("/api/hello"))
+        mockMvc.perform(get("/hello"))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test // 異常：JWT が不正
     void access_withInvalidJwt_returns401() throws Exception {
-        mockMvc.perform(get("/api/hello")
+        mockMvc.perform(get("/hello")
                 .cookie(new Cookie(JwtCookie.COOKIE_NAME, "invalid-token")))
                 .andExpect(status().isUnauthorized());
     }

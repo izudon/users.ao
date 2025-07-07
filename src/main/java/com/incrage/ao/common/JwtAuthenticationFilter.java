@@ -21,6 +21,9 @@ import io.jsonwebtoken.JwtException;
 
 import java.io.IOException;
 import java.util.Collections;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Map;
+
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -67,15 +70,31 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext()
 		.setAuthentication(authentication);
 
+        } catch (JwtException e) {
+	    SecurityContextHolder.clearContext(); // 認証エラーにつき削除
+            handleUnauthorized(response, e.getClass().getSimpleName());
+	    return;
         } catch (Exception e) {
-	    // 1. 認証エラーだったのでコンテキストを削除。
-	    SecurityContextHolder.clearContext();
-		
-            // 2. 401 をここでもう返してしまう。
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
-		"Unauthorized: " + e.getMessage());
-            return;
+	    SecurityContextHolder.clearContext(); // 認証エラーにつき削除
+            handleUnauthorized(response, e.getMessage());
+	    return;
 	}
         filterChain.doFilter(request, response); // -> 最終的に 401 になるはず
+    }
+
+
+    private void handleUnauthorized
+	(HttpServletResponse response, String message) throws IOException {
+	response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
+	response.setContentType("application/json");
+	response.setCharacterEncoding("UTF-8");
+
+	Map<String, Object> errorResponse = Map.of(
+            "type"  , "about:blank",
+            "title" , message,
+            "status", HttpServletResponse.SC_UNAUTHORIZED 
+        );
+
+	new ObjectMapper().writeValue(response.getWriter(), errorResponse);
     }
 }
