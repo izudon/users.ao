@@ -1,14 +1,35 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>200 logged-out</title>
+  <title>Logged out successfully.</title>
 </head>
 <body>
-    <h1>ログアウトしました</h1>
-    <ul>
-      <li>認証情報（誰であるかの情報）をブラウザから削除しました。</li>
-      <li>再度ログインされるまでこの情報は当社には送られません。</li>
-    </p>
-    <a th:href="${return_to}" th:if="${return_to != null}">元のページに戻る</a>
+  <h1>ログアウトしました</h1>
+  <div>Logged out successfully.</div>
+  <div>로그아웃 완료</div>
+
+  <ul>
+    <li>
+      <div>認証情報（誰であるかの情報）をブラウザから削除しました。</div>
+      <div>Your authentication information has been deleted from your
+	browser.</div>
+      <div>인증 정보가 브라우저에서 삭제되었습니다.</div>
+    </li>
+    <li>
+      <div>再度ログインされるまでこの情報は当社には送られません。</div>
+      <div>It will not be transmitted to us again until you log in once
+	more.</div>
+      <div>다시 로그인하기 전까지 이 정보는 전송되지 않습니다.</div>
+    </li>
+  </ul>
+
+  <p>
+    <a th:href="${return_to}" th:if="${return_to != null}">
+      <div>元のページに戻る</div>
+      <div>Go back to the previous page.</div>
+      <div>이전 페이지로 돌아가기</div>
+    </a>
+  </p>
+
 </body>
 </html>

@@ -1,11 +1,29 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>401 Unauthorized</title>
+    <title>401 Authentication failed.</title>
 </head>
 <body>
-    <h1>認証できませんでした</h1>
-    <p>外部での認証処理がうまくいかずログインができませんでした。</p>
-    <a th:href="${return_to}" th:if="${return_to != null}">元のページに戻る</a>
+  <h1>認証できませんでした</h1>
+  <div>Authentication failed.</div>
+  <div>인증 실패</div>
+
+  <ul>
+    <li>
+      <div>外部での認証処理がうまくいかずログインができませんでした。</div>
+      <div>We couldn’t log you in because the social login proces
+	failed.</div>
+      <div>소셜 로그인 과정에 문제가 있어 로그인할 수 없습니다.</div>
+    </li>
+  </ul>
+
+  <p>
+    <a th:href="${return_to}" th:if="${return_to != null}">
+      <div>元のページに戻る</div>
+      <div>Go back to the previous page.</div>
+      <div>이전 페이지로 돌아가기</div>
+    </a>
+  </p>
+
 </body>
 </html>
